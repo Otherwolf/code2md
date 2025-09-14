@@ -1,0 +1,120 @@
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pycache__",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv"
+]
+line-length = 120
+respect-gitignore = true
+target-version = "py312"
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+indent-style = "space"
+line-ending = "auto"
+quote-style = "single"
+skip-magic-trailing-comma = false
+
+[lint]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+fixable = ["ALL"]
+ignore = [
+  "D100",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D107",
+  "D203",
+  "D213",
+  "ANN002",
+  "ANN003",
+  "S101",
+  "S311",
+  "B008",
+  "COM812",
+  "COM819",
+  "FBT001",
+  "FBT002",
+  "T201",
+  "RUF001",
+  "RUF002",
+  "RUF003",
+  "RUF012",
+  "DTZ005",
+  "EM101",
+  "EM102",
+  "TRY003"
+]
+select = [
+  "E",  # pycodestyle errors
+  "W",  # pycodestyle warnings
+  "F",  # pyflakes
+  "I",  # isort
+  "B",  # flake8-bugbear
+  "D",  # pydocstyle
+  "UP",  # pyupgrade
+  "ANN",  # flake8-annotations
+  "C4",  # flake8-comprehensions
+  "PYI",  # flake8-pyi
+  "Q",  # flake8-quotes
+  "RET",  # flake8-return
+  "SIM",  # flake8-simplify
+  "PERF",  # Perflint
+  "RUF",  # Ruff-specific rules
+  "PIE",  # flake8-pie
+  "TID",  # flake8-tidy-imports
+  "TD",  # flake8-todos
+  "PLC",  # pylint conventions
+  "PLE",  # pylint errors
+  "TRY",  # tryceratops
+  "COM",  # flake8-commas
+  "ASYNC",  # flake8-async
+  "S",  # flake8-bandit (security)
+  "A",  # flake8-builtins
+  "DTZ",  # flake8-datetimez
+  "EM",  # flake8-errmsg
+  "FBT",  # flake8-boolean-trap
+  "ICN",  # flake8-import-conventions
+  "PT",  # flake8-pytest-style
+  "T20"  # flake8-print
+]
+unfixable = []
+
+[lint.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[lint.isort]
+combine-as-imports = true
+force-wrap-aliases = true
+known-first-party = ["uc"]
+split-on-trailing-comma = true
+
+[lint.per-file-ignores]
+"**/migrations/**/*.py" = ["ANN", "D"]
+"conftest.py" = ["D", "ANN"]
+"setup.py" = ["ALL"]
+"tests/**/*.py" = ["S101", "ANN", "D", "FBT"]
+
+[lint.pydocstyle]
+convention = "google"

@@ -1,0 +1,76 @@
+repos:
+  # Ruff - современный форматтер для Python
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.0
+    hooks:
+      - id: ruff-format
+        name: "Python Formatter"
+        language_version: python3.12
+
+  # Форматтер для Dockerfile
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        name: "Dockerfile Linter & Formatter"
+        args:
+          - --ignore=DL3008  # Pin versions in apt get install
+          - --ignore=DL3009  # Delete the apt-get lists after installing
+          - --ignore=DL3015  # Avoid additional packages by specifying --no-install-recommends
+          - --ignore=DL3025  # Use arguments JSON notation for CMD and ENTRYPOINT arguments
+
+  # Альтернативный форматтер для Dockerfile (более мягкий)
+  - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+    rev: v0.1.0
+    hooks:
+      - id: dockerfilelint
+        stages: [pre-commit]
+
+  # SQLFluff - форматтер для SQL
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.0.7
+    hooks:
+      - id: sqlfluff-fix
+        name: "SQL Formatter"
+        args:
+          - --dialect=postgres  # Замените на ваш диалект: postgres/mysql/sqlite/oracle
+          - --rules=L001,L002,L003,L004,L005  # Основные правила форматирования
+        additional_dependencies: ['dbt-postgres', 'sqlfluff-templater-dbt']
+
+      - id: sqlfluff-lint
+        name: "SQL Linter"
+        args: [--dialect=postgres]
+
+  # Базовые исправления файлов
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: end-of-file-fixer
+        name: "Fix end of files"
+      - id: trailing-whitespace
+        name: "Trim trailing whitespace"
+        args: [--markdown-linebreak-ext=md]
+      - id: mixed-line-ending
+        name: "Fix line endings"
+        args: [--fix=lf]
+
+default_language_version:
+  python: python3.12
+
+fail_fast: false
+
+# Исключения для определенных файлов
+exclude: |
+  (?x)^(
+      \.git/|
+      \.mypy_cache/|
+      \.pytest_cache/|
+      \.ruff_cache/|
+      __pycache__/|
+      build/|
+      dist/|
+      \.venv/|
+      venv/|
+      migrations/.*\.py$|
+      alembic/versions/.*\.py$
+  )$

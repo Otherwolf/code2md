@@ -1,0 +1,17 @@
+*.pyc
+*.pyo
+.ve*
+__pycache__
+.pytest_cache*
+*.egg-info
+.cache*
+.eggs*
+.coverage
+*,cover
+htmlcov
+build
+dist
+.reports*
+.idea/
+dev/*
+venv
