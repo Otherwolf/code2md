@@ -11,7 +11,7 @@ class DefaultFileCollector(FileCollector):
     def __init__(self, verbose: bool = False) -> None:
         self.verbose = verbose
         if verbose:
-            logging.basicConfig(level=logging.INFO)
+            logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = None
@@ -22,68 +22,59 @@ class DefaultFileCollector(FileCollector):
             excluded_dirs: set[str],
             excluded_files: set[str],
             excluded_extensions: set[str],
+            exclude_dotfiles: bool,
     ) -> tuple[list[str], list[Path]]:
-        """Собирает структуру директории и список файлов для включения.
-
-        Args:
-            start_path: Путь к корневой директории для сканирования
-            excluded_dirs: Множество папок для исключения
-            excluded_files: Множество файлов для исключения
-            excluded_extensions: Множество расширений для исключения
-
-        Returns:
-            Кортеж из (дерево проекта, список файлов для включения)
-        """
+        """Собирает структуру директории и список файлов для включения."""
         project_tree = []
         files_to_include = []
 
         if self.logger:
-            self.logger.info(f'Start collecting files from the directory: {start_path}')
-            self.logger.info(f'Excluded directories: {excluded_dirs}')
-            self.logger.info(f'Excluded files: {excluded_files}')
-            self.logger.info(f'Excluded extensions: {excluded_extensions}')
+            self.logger.info(f'Начинаю сбор из: {start_path}')
+            self.logger.info(f'Исключенные директории: {excluded_dirs or "Нет"}')
+            self.logger.info(f'Исключенные файлы: {excluded_files or "Нет"}')
+            self.logger.info(f'Исключенные расширения: {excluded_extensions or "Нет"}')
+            self.logger.info(f'Исключать dot-файлы: {"Да" if exclude_dotfiles else "Нет"}')
 
-        # Используем os.walk для рекурсивного обхода
         for root, dirs, files in os.walk(start_path, topdown=True):
-            # Исключаем ненужные директории из дальнейшего обхода
-            dirs[:] = [d for d in sorted(dirs) if self._should_include_dir(d, excluded_dirs)]
+            # Фильтруем директории, чтобы os.walk не заходил в них
+            dirs[:] = [
+                d for d in sorted(dirs)
+                if self._should_include(d, excluded_dirs, set(), set(), exclude_dotfiles, is_dir=True)
+            ]
 
             root_path = Path(root)
             level = len(root_path.relative_to(start_path).parts)
             indent = '    ' * level
 
-            # Добавляем текущую папку в дерево
-            dir_name = root_path.name if level > 0 else start_path.name
-            project_tree.append(f'{indent}📂 {dir_name}/')
-
-            if self.logger:
-                self.logger.info(f'Processing the directory: {root_path}')
+            if level > 0:
+                project_tree.append(f'{indent}📂 {root_path.name}/')
 
             sub_indent = '    ' * (level + 1)
-            processed_files = 0
-
             for filename in sorted(files):
-                if self._should_include_file(filename, excluded_files, excluded_extensions):
+                if self._should_include(filename, excluded_dirs, excluded_files, excluded_extensions, exclude_dotfiles):
                     file_path = root_path / filename
                     files_to_include.append(file_path)
                     project_tree.append(f'{sub_indent}📄 {filename}')
-                    processed_files += 1
-
-            if self.logger and processed_files > 0:
-                self.logger.info(f'  Added files: {processed_files}')
-
-        if self.logger:
-            self.logger.info(f'Total files to include: {len(files_to_include)}')
 
         return project_tree, files_to_include
 
     @staticmethod
-    def _should_include_dir(dir_name: str, excluded_dirs: set[str]) -> bool:
-        """Проверяет, следует ли включить директорию."""
-        return dir_name not in excluded_dirs and not any(
-            ex_dir in dir_name for ex_dir in excluded_dirs if 'egg-info' in ex_dir)
+    def _should_include(
+            name: str,
+            excluded_dirs: set[str],
+            excluded_files: set[str],
+            excluded_extensions: set[str],
+            exclude_dotfiles: bool,
+            is_dir: bool = False
+    ) -> bool:
+        """Проверяет, следует ли включить данный файл или директорию."""
+        if exclude_dotfiles and name.startswith('.'):
+            return False
 
-    @staticmethod
-    def _should_include_file(filename: str, excluded_files: set[str], excluded_extensions: set[str]) -> bool:
-        """Проверяет, следует ли включить файл."""
-        return filename not in excluded_files and Path(filename).suffix not in excluded_extensions
+        if is_dir:
+            return name not in excluded_dirs
+
+        if name in excluded_files:
+            return False
+
+        return Path(name).suffix.lower() not in excluded_extensions

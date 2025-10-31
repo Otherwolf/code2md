@@ -1,3 +1,25 @@
+# Набор стандартных исключений для Python проектов
+PYTHON_DEFAULT_EXCLUDED_DIRS = {
+    '__pycache__', '.venv', 'venv', 'env', '.eggs', '.egg-info',
+    '.mypy_cache', '.pytest_cache', '.ruff_cache', 'htmlcov', 'build', 'dist',
+    'pip-wheel-metadata',
+}
+PYTHON_DEFAULT_EXCLUDED_FILES = {'pip-freeze.txt', 'requirements.txt'}
+PYTHON_DEFAULT_EXCLUDED_EXTENSIONS = {'.pyc', '.pyo', '.so', '.lock'}
+
+# Набор стандартных исключений для Frontend проектов
+FRONTEND_DEFAULT_EXCLUDED_DIRS = {'node_modules', '.next', 'out', 'public', 'static'}
+FRONTEND_DEFAULT_EXCLUDED_FILES = {
+    'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'next-env.d.ts'
+}
+FRONTEND_DEFAULT_EXCLUDED_EXTENSIONS = {'.log', '.tmp', '.lock'}
+
+# Общие исключения, которые почти всегда не нужны (системы контроля версий, IDE)
+GENERAL_EXCLUDED_DIRS = {'.git', '.svn', '.hg', '.idea', '.vscode'}
+GENERAL_EXCLUDED_FILES = {'.DS_Store', 'Thumbs.db'}
+
+
+# Карта языков для подсветки синтаксиса (осталась без изменений)
 LANGUAGE_MAP = {
     # Python
     '.py': 'python',

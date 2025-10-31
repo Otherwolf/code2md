@@ -12,6 +12,7 @@ class FileCollector(ABC):
         excluded_dirs: set[str],
         excluded_files: set[str],
         excluded_extensions: set[str],
+        exclude_dotfiles: bool,
     ) -> tuple[list[str], list[Path]]:
         pass
 
