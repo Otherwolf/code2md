@@ -1,4 +1,3 @@
-# Набор стандартных исключений для Python проектов
 PYTHON_DEFAULT_EXCLUDED_DIRS = {
     '__pycache__',
     '.venv',
@@ -6,28 +5,81 @@ PYTHON_DEFAULT_EXCLUDED_DIRS = {
     'env',
     '.eggs',
     '.egg-info',
+    '*.egg-info',
     '.mypy_cache',
     '.pytest_cache',
     '.ruff_cache',
+    '.tox',
+    '.nox',
     'htmlcov',
     'build',
     'dist',
+    'site',
     'pip-wheel-metadata',
 }
-PYTHON_DEFAULT_EXCLUDED_FILES = {'pip-freeze.txt', 'requirements.txt'}
-PYTHON_DEFAULT_EXCLUDED_EXTENSIONS = {'.pyc', '.pyo', '.so', '.lock'}
 
-# Набор стандартных исключений для Frontend проектов
-FRONTEND_DEFAULT_EXCLUDED_DIRS = {'node_modules', '.next', 'out', 'public', 'static'}
-FRONTEND_DEFAULT_EXCLUDED_FILES = {'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'next-env.d.ts'}
-FRONTEND_DEFAULT_EXCLUDED_EXTENSIONS = {'.log', '.tmp', '.lock'}
+PYTHON_DEFAULT_EXCLUDED_FILES = {
+    'pip-freeze.txt',
+    'requirements.txt',
+}
 
-# Общие исключения, которые почти всегда не нужны (системы контроля версий, IDE)
-GENERAL_EXCLUDED_DIRS = {'.git', '.svn', '.hg', '.idea', '.vscode'}
-GENERAL_EXCLUDED_FILES = {'.DS_Store', 'Thumbs.db'}
+PYTHON_DEFAULT_EXCLUDED_EXTENSIONS = {
+    '.pyc',
+    '.pyo',
+    '.so',
+    '.lock',
+}
 
+FRONTEND_DEFAULT_EXCLUDED_DIRS = {
+    'node_modules',
+    '.next',
+    '.nuxt',
+    '.svelte-kit',
+    '.parcel-cache',
+    '.turbo',
+    '.vercel',
+    'coverage',
+    'out',
+    'public',
+    'static',
+    'dist',
+    'build',
+}
 
-# Карта языков для подсветки синтаксиса (осталась без изменений)
+FRONTEND_DEFAULT_EXCLUDED_FILES = {
+    'package-lock.json',
+    'yarn.lock',
+    'pnpm-lock.yaml',
+    'bun.lockb',
+    'next-env.d.ts',
+}
+
+FRONTEND_DEFAULT_EXCLUDED_EXTENSIONS = {
+    '.log',
+    '.tmp',
+    '.lock',
+    '.tsbuildinfo',
+}
+
+GENERAL_EXCLUDED_DIRS = {
+    '.git',
+    '.svn',
+    '.hg',
+    '.idea',
+    '.vscode',
+}
+
+GENERAL_EXCLUDED_FILES = {
+    '.DS_Store',
+    'Thumbs.db',
+    '.coverage',
+    'coverage.xml',
+}
+
+GENERAL_EXCLUDED_EXTENSIONS = {
+    '.sqlite3',
+}
+
 LANGUAGE_MAP = {
     # Python
     '.py': 'python',
@@ -46,7 +98,7 @@ LANGUAGE_MAP = {
     '.scss': 'scss',
     '.sass': 'sass',
     '.less': 'less',
-    # _markup languages
+    # Markup languages
     '.xml': 'xml',
     '.json': 'json',
     '.yaml': 'yaml',
@@ -115,7 +167,7 @@ LANGUAGE_MAP = {
     # Dart
     '.dart': 'dart',
     # Objective-C
-    '.m': 'objectivec',  # Может конфликтовать с MATLAB
+    '.m': 'objectivec',
     '.mm': 'objectivec',
     # Docker
     'Dockerfile': 'dockerfile',

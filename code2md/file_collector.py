@@ -1,3 +1,4 @@
+import fnmatch
 import logging
 import os
 from pathlib import Path
@@ -36,7 +37,6 @@ class DefaultFileCollector(FileCollector):
             self.logger.info(f'Исключать dot-файлы: {"Да" if exclude_dotfiles else "Нет"}')
 
         for root, dirs, files in os.walk(start_path, topdown=True):
-            # Фильтруем директории, чтобы os.walk не заходил в них
             dirs[:] = [
                 d
                 for d in sorted(dirs)
@@ -60,7 +60,13 @@ class DefaultFileCollector(FileCollector):
         return project_tree, files_to_include
 
     @staticmethod
+    def _matches_patterns(name: str, patterns: set[str]) -> bool:
+        """Проверяет совпадение имени с точными именами и glob-паттернами."""
+        return any(fnmatch.fnmatch(name, pattern) for pattern in patterns)
+
+    @classmethod
     def _should_include(
+        cls,
         name: str,
         excluded_dirs: set[str],
         excluded_files: set[str],
@@ -73,9 +79,9 @@ class DefaultFileCollector(FileCollector):
             return False
 
         if is_dir:
-            return name not in excluded_dirs
+            return not cls._matches_patterns(name, excluded_dirs)
 
-        if name in excluded_files:
+        if cls._matches_patterns(name, excluded_files):
             return False
 
         return Path(name).suffix.lower() not in excluded_extensions
