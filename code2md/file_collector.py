@@ -17,12 +17,12 @@ class DefaultFileCollector(FileCollector):
             self.logger = None
 
     def collect(
-            self,
-            start_path: Path,
-            excluded_dirs: set[str],
-            excluded_files: set[str],
-            excluded_extensions: set[str],
-            exclude_dotfiles: bool,
+        self,
+        start_path: Path,
+        excluded_dirs: set[str],
+        excluded_files: set[str],
+        excluded_extensions: set[str],
+        exclude_dotfiles: bool,
     ) -> tuple[list[str], list[Path]]:
         """Собирает структуру директории и список файлов для включения."""
         project_tree = []
@@ -38,7 +38,8 @@ class DefaultFileCollector(FileCollector):
         for root, dirs, files in os.walk(start_path, topdown=True):
             # Фильтруем директории, чтобы os.walk не заходил в них
             dirs[:] = [
-                d for d in sorted(dirs)
+                d
+                for d in sorted(dirs)
                 if self._should_include(d, excluded_dirs, set(), set(), exclude_dotfiles, is_dir=True)
             ]
 
@@ -60,12 +61,12 @@ class DefaultFileCollector(FileCollector):
 
     @staticmethod
     def _should_include(
-            name: str,
-            excluded_dirs: set[str],
-            excluded_files: set[str],
-            excluded_extensions: set[str],
-            exclude_dotfiles: bool,
-            is_dir: bool = False
+        name: str,
+        excluded_dirs: set[str],
+        excluded_files: set[str],
+        excluded_extensions: set[str],
+        exclude_dotfiles: bool,
+        is_dir: bool = False,
     ) -> bool:
         """Проверяет, следует ли включить данный файл или директорию."""
         if exclude_dotfiles and name.startswith('.'):

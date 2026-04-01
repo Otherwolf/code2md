@@ -1,0 +1,220 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code2md"
+version = "1.0.0"
+description = "Collect project structure and file contents into Markdown"
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+  { name = "vpe304@gmail.com" },
+]
+dependencies = []
+
+[project.scripts]
+code2md = "code2md.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = false
+
+# ============================================================================
+# Dependency groups
+# ============================================================================
+
+[dependency-groups]
+dev = [
+  "ipython>=8.26.0",
+  "pytest>=8.4.2",
+  "pytest-mock==3.15.1",
+  "pytest-asyncio==1.1.0",
+  "pytest-dotenv==0.5.2",
+  "pytest-cov==7.0.0",
+  "freezegun==1.5.5",
+]
+
+lint = [
+  "mypy>=1.14.0",
+  "ruff>=0.14.0",
+  "types-pyyaml>=6.0.12.20241230",
+  "pre-commit>=4.0.1",
+]
+
+security = [
+  "bandit>=1.7.10",
+  "safety>=3.2.11",
+]
+
+# ============================================================================
+# Pytest Configuration
+# ============================================================================
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+env_override_existing_values = 1
+env_files = []
+
+# ============================================================================
+# Ruff Configuration
+# ============================================================================
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+indent-width = 4
+show-fixes = true
+extend-exclude = [
+  ".venv",
+  "__pycache__",
+  "*.pyi",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle
+  "F",    # pyflakes
+  "I",    # isort
+  "Q",    # quotes
+  "UP",   # pyupgrade
+  "B",    # bugbear
+  "ASYNC",
+  "C4",
+  "PT",
+  "N",
+  "TRY",
+  "BLE",
+  "SIM",
+  "FAST",
+  "PIE",
+  "RET",
+  "W292",
+  "W391",
+  "RUF022",
+  "FURB",
+]
+ignore = [
+  "E501",   # line length — formatter decides
+  "B008",   # function calls in defaults (not critical here)
+  "D100",
+  "D104",
+  "D107",
+  "D202",
+  "D203",
+  "D213",
+  "TRY400",
+  "TRY003",
+]
+unfixable = ["B"]
+preview = true
+explicit-preview-rules = true
+extend-safe-fixes = [
+  "FURB171",
+  "PERF401",
+  "RET504",
+  "RUF022",
+  "TID252",
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "double"
+docstring-quotes = "double"
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+known-first-party = ["code2md"]
+split-on-trailing-comma = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"tests/**/*.py" = [
+  "S101",
+  "PT011",
+  "PT012",
+  "D",
+]
+
+# ============================================================================
+# Mypy Configuration
+# ============================================================================
+
+[tool.mypy]
+python_version = "3.11"
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = false
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+exclude = [
+  "^tests/",
+  "*.pyi",
+]
+
+# ============================================================================
+# Bandit Configuration
+# ============================================================================
+
+[tool.bandit]
+exclude_dirs = [
+  "tests",
+  ".venv",
+  "*.pyi",
+]
+
+# ============================================================================
+# Pylint (optional, narrow rule set)
+# ============================================================================
+
+[tool.pylint.messages_control]
+disable = ["all"]
+enable = ["disallowed-name"]
+
+[tool.pylint.basic]
+bad-names = [
+  "e",
+  "ex",
+  "req",
+  "res",
+  "resp",
+  "ctx",
+  "foo",
+  "col",
+  "bar",
+  "baz",
+  "tmp",
+  "temp",
+  "val",
+  "lst",
+  "dct",
+  "usr",
+  "msg",
+  "pwd",
+  "qty",
+  "amt",
+  "fmt",
+  "stmt",
+  "idx",
+]
+bad-names-rgxs = ["^(?![ixy]$)_*[A-Za-z]_*$"]
