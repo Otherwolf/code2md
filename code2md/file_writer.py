@@ -7,6 +7,10 @@ from code2md.interfaces import FileWriter
 class MarkdownFileWriter(FileWriter):
     """Записывает результаты в формате Markdown."""
 
+    _TEXT_BYTES = bytes(range(32, 127)) + b'\n\r\t\f\b'
+    _CHUNK_SIZE = 8192
+    _BINARY_THRESHOLD = 0.30
+
     @classmethod
     def _is_binary_file(cls, file_path: Path) -> bool:
         """Проверяет, является ли файл бинарным.
@@ -18,17 +22,30 @@ class MarkdownFileWriter(FileWriter):
             True, если файл бинарный, иначе False
         """
         try:
-            with open(file_path, 'rb') as f:
-                chunk = f.read(1024)
+            with file_path.open('rb') as f:
+                chunk = f.read(cls._CHUNK_SIZE)
+
+            if not chunk:
+                return False
 
             if b'\x00' in chunk:
                 return True
 
-            chunk.decode('utf-8')
-            return False
-        except UnicodeDecodeError:
-            return True
-        except Exception:
+            try:
+                chunk.decode('utf-8')
+                return False
+            except UnicodeDecodeError as exc:
+                if exc.start >= len(chunk) - 4:
+                    try:
+                        chunk.decode('utf-8', errors='ignore')
+                        return False
+                    except Exception:
+                        pass
+
+            nontext = sum(byte not in cls._TEXT_BYTES for byte in chunk)
+            return (nontext / len(chunk)) > cls._BINARY_THRESHOLD
+
+        except OSError:
             return False
 
     @classmethod
@@ -85,7 +102,7 @@ class MarkdownFileWriter(FileWriter):
                 if use_markers:
                     f.write(f'<!-- FILE: {relative_path} START -->\n')
 
-                f.write(f'## 📄 Файл: `{relative_path}`\n')
+                f.write(f'### 📄 Файл: `{relative_path}`\n')
 
                 if cls._is_binary_file(file_path):
                     f.write('[Бинарный файл - содержимое не отображается]\n')
