@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 
 
@@ -74,14 +76,33 @@ $fileDropList.Add("{path}") | Out-Null
 
 def _copy_file_linux(path: Path) -> None:
     uri_list = f'{path.as_uri()}\n'
+    wayland_display = os.environ.get('WAYLAND_DISPLAY')
+    x_display = os.environ.get('DISPLAY')
 
-    backends = [
-        ['wl-copy', '--type', 'text/uri-list'],
-        ['xclip', '-selection', 'clipboard', '-t', 'text/uri-list'],
-        ['xsel', '--clipboard', '--input'],
-    ]
+    backends: list[list[str]] = []
 
-    last_error: Exception | None = None
+    if wayland_display and shutil.which('wl-copy'):
+        backends.append(['wl-copy', '--type', 'text/uri-list'])
+
+    if x_display:
+        if shutil.which('xclip'):
+            backends.append(['xclip', '-selection', 'clipboard', '-t', 'text/uri-list'])
+        if shutil.which('xsel'):
+            backends.append(['xsel', '--clipboard', '--input'])
+
+    if not backends:
+        if not wayland_display and not x_display:
+            raise ClipboardFileCopyError(
+                'No graphical clipboard session found on Linux. '
+                'WAYLAND_DISPLAY and DISPLAY are unset.'
+            )
+
+        raise ClipboardFileCopyError(
+            'No supported Linux clipboard backend found for the current session. '
+            'Install wl-clipboard for Wayland, or xclip/xsel for X11.'
+        )
+
+    errors: list[str] = []
 
     for cmd in backends:
         try:
@@ -93,12 +114,7 @@ def _copy_file_linux(path: Path) -> None:
                 text=True,
             )
             return
-        except FileNotFoundError as exc:
-            last_error = exc
-            continue
         except subprocess.CalledProcessError as exc:
-            raise ClipboardFileCopyError(exc.stderr.strip() or str(exc)) from exc
+            errors.append(f'{" ".join(cmd)}: {exc.stderr.strip() or str(exc)}')
 
-    raise ClipboardFileCopyError(
-        'No supported Linux clipboard backend found. Install one of: wl-clipboard, xclip, or xsel.'
-    ) from last_error
+    raise ClipboardFileCopyError(' ; '.join(errors))
