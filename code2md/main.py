@@ -130,16 +130,13 @@ def main() -> None:
         exclude_dotfiles=args.exclude_dotfiles,
     )
 
-    total_bytes = sum(file_path.stat().st_size for file_path in files_to_include)
-    use_markers = len(files_to_include) <= MAX_MARKER_FILES and total_bytes <= MAX_MARKER_BYTES
-
     file_writer = MarkdownFileWriter()
     file_writer.write(
         output_file=output_file,
         project_tree=project_tree,
         files_to_include=files_to_include,
         start_path=start_path,
-        use_markers=use_markers,
+        use_markers=True,
     )
 
     if args.copy:
